@@ -17,7 +17,7 @@ services:
   spark:
     image: apache/spark-py:v3.3.0
     container_name: spark
-    user: root  
+    user: root
     ports:
       - "4040:4040"
       - "8888:8888"
@@ -26,7 +26,16 @@ services:
     environment:
       - PYSPARK_PYTHON=python3
       - PYTHONPATH=/opt/spark/python
-    command: /bin/bash -c "pip install --no-cache-dir jupyter && jupyter notebook --ip=0.0.0.0 --port=8888 --notebook-dir=/opt/notebooks --no-browser --allow-root"
+      - SPARK_JARS_PACKAGES=org.apache.iceberg:iceberg-spark-runtime-3.3_2.12:1.4.2,org.apache.hadoop:hadoop-aws:3.3.2,com.amazonaws:aws-java-sdk-bundle:1.11.1026
+    command: >
+      /bin/bash -c "
+        apt-get update && apt-get install -y wget &&
+        pip install --no-cache-dir jupyter py4j pyspark==3.3.0 &&
+        wget https://repo1.maven.org/maven2/org/apache/iceberg/iceberg-spark-runtime-3.3_2.12/1.4.2/iceberg-spark-runtime-3.3_2.12-1.4.2.jar -P /opt/spark/jars/ &&
+        wget https://repo1.maven.org/maven2/org/apache/hadoop/hadoop-aws/3.3.2/hadoop-aws-3.3.2.jar -P /opt/spark/jars/ &&
+        wget https://repo1.maven.org/maven2/com/amazonaws/aws-java-sdk-bundle/1.11.1026/aws-java-sdk-bundle-1.11.1026.jar -P /opt/spark/jars/ &&
+        jupyter notebook --ip=0.0.0.0 --port=8888 --notebook-dir=/opt/notebooks --no-browser --allow-root
+      "
 
 volumes:
   minio_data:
