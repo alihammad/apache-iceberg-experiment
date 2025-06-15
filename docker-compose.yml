@@ -37,5 +37,17 @@ services:
         jupyter notebook --ip=0.0.0.0 --port=8888 --notebook-dir=/opt/notebooks --no-browser --allow-root
       "
 
+  trino-coordinator:
+    image: trinodb/trino:419
+    container_name: trino
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./trino/catalog:/etc/trino/catalog
+      - ./trino/etc:/etc/trino
+    environment:
+      - TRINO_HEAP_MAX=4G
+      - TRINO_HEAP_MIN=2G
+
 volumes:
   minio_data:
