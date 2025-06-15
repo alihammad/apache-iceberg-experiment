@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  minio:
+    image: minio/minio
+    container_name: minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    command: server /data --console-address ":9001"
+
+  spark:
+    image: apache/spark-py:v3.3.0
+    container_name: spark
+    ports:
+      - "4040:4040"
+      - "8888:8888"
+    volumes:
+      - ./notebooks:/opt/notebooks
+    environment:
+      - PYSPARK_PYTHON=python3
+    command: >
+      bash -c "
+        jupyter notebook --ip=0.0.0.0 --port=8888 --notebook-dir=/opt/notebooks --no-browser --allow-root
+      "
+
+volumes:
+  minio_data:
