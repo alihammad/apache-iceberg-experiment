@@ -17,6 +17,7 @@ services:
   spark:
     image: apache/spark-py:v3.3.0
     container_name: spark
+    user: root  
     ports:
       - "4040:4040"
       - "8888:8888"
@@ -24,10 +25,8 @@ services:
       - ./notebooks:/opt/notebooks
     environment:
       - PYSPARK_PYTHON=python3
-    command: >
-      bash -c "
-        jupyter notebook --ip=0.0.0.0 --port=8888 --notebook-dir=/opt/notebooks --no-browser --allow-root
-      "
+      - PYTHONPATH=/opt/spark/python
+    command: /bin/bash -c "pip install --no-cache-dir jupyter && jupyter notebook --ip=0.0.0.0 --port=8888 --notebook-dir=/opt/notebooks --no-browser --allow-root"
 
 volumes:
   minio_data:
